@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tafiti Pro — Research Assistant Tanzania</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#06080F;--surface:#0D1117;--card:#131920;--border:#1E2A38;--border2:#2A3848;
+  --text:#E8EEF5;--muted:#6B8299;--muted2:#3A5060;
+  --amber:#E8A020;--amber2:#C8801A;--abg:rgba(232,160,32,.13);
+  --teal:#1FB8A0;--tbg:rgba(31,184,160,.13);
+  --rose:#E84060;--green:#22C55E;--blue:#3B82F6;--purple:#9B5DE5;
+  --ff:'Outfit',sans-serif;--ffm:'Playfair Display',serif;--ffc:'JetBrains Mono',monospace;
+  --r:8px;--r2:12px;--r3:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+::selection{background:var(--amber);color:#000}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── UTILS ── */
+.hide{display:none!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--ff);font-size:14px;font-weight:600;padding:11px 22px;border:none;border-radius:var(--r);cursor:pointer;transition:all .2s;text-decoration:none;white-space:nowrap}
+.btn-a{background:var(--amber);color:#000}.btn-a:hover{background:var(--amber2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,160,32,.35)}
+.btn-t{background:var(--teal);color:#000}.btn-t:hover{background:#18a892;transform:translateY(-1px)}
+.btn-g{background:transparent;border:1.5px solid var(--border2);color:var(--text)}.btn-g:hover{border-color:var(--amber);color:var(--amber)}
+.btn-sm{padding:7px 15px;font-size:13px}
+.btn-lg{padding:15px 36px;font-size:16px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.wf{width:100%}
+
+/* ── INPUTS ── */
+.ig{margin-bottom:16px}
+.ig label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.ig label .req{color:var(--rose)}.ig label .opt{color:var(--muted2);font-weight:400}
+input,textarea,select{width:100%;background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--ff);font-size:14px;padding:10px 13px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--amber)}
+input::placeholder,textarea::placeholder{color:var(--muted2)}
+select option{background:var(--card)}
+textarea{resize:vertical;min-height:88px;line-height:1.5}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 9px;border-radius:20px;font-family:var(--ffc)}
+.ba{background:var(--abg);color:var(--amber)}.bt{background:var(--tbg);color:var(--teal)}
+.bg{background:rgba(34,197,94,.12);color:var(--green)}.br{background:rgba(232,64,96,.12);color:var(--rose)}
+.bb{background:rgba(59,130,246,.12);color:var(--blue)}.bp{background:rgba(155,93,229,.12);color:var(--purple)}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:22px}
+.ch{display:flex;justify-content:space-between;align-items:center;padding-bottom:13px;margin-bottom:17px;border-bottom:1px solid var(--border)}
+.ct{font-size:14px;font-weight:700}
+
+/* ── MODAL ── */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(5px);z-index:9000;align-items:center;justify-content:center;padding:16px}
+.mo.open{display:flex;animation:fadeIn .2s}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:var(--r3);padding:28px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;position:relative;animation:slideDown .25s ease;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.modal-lg{max-width:600px}
+.mcls{position:absolute;top:13px;right:13px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;border-radius:4px;transition:color .15s}
+.mcls:hover{color:var(--text)}
+.mt{font-family:var(--ffm);font-size:22px;font-weight:700;margin-bottom:4px}
+.ms{font-size:13px;color:var(--muted);margin-bottom:22px}
+
+/* ── TOAST ── */
+#toasts{position:fixed;top:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:9px;pointer-events:none}
+.toast{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:12px 18px;font-size:13px;font-weight:500;min-width:250px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.5);animation:slideDown .3s ease;display:flex;align-items:center;gap:9px;pointer-events:all}
+.tok{border-left:3px solid var(--green)}.ter{border-left:3px solid var(--rose)}.tinf{border-left:3px solid var(--blue)}.twarn{border-left:3px solid var(--amber)}
+
+/* ── TOP NAV ── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:500;height:60px;background:rgba(6,8,15,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:4px}
+.brand{font-family:var(--ffm);font-size:17px;font-weight:700;color:var(--amber);margin-right:auto;cursor:pointer;display:flex;align-items:center;gap:7px;text-decoration:none;border:none;background:none}
+.brand small{font-size:11px;color:var(--muted);font-family:var(--ff);font-weight:400;display:block;line-height:1}
+.nl{font-size:13px;font-weight:500;color:var(--muted);padding:7px 12px;border-radius:var(--r);cursor:pointer;transition:all .15s;border:none;background:none}
+.nl:hover{color:var(--text);background:var(--border)}.nl.show{display:block!important}
+#authBtns{display:flex;gap:8px}
+#userArea{display:none;align-items:center;gap:9px}
+.navav{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--rose));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;cursor:pointer;flex-shrink:0}
+.hbg{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;margin-left:8px}
+
+/* ── LANDING ── */
+#landing{display:none}
+#landing.on{display:block}
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;padding-top:60px}
+.hvw{position:absolute;inset:0;z-index:0;overflow:hidden}
+.hvw::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(6,8,15,.9) 0%,rgba(6,8,15,.55) 50%,rgba(6,8,15,.8) 100%);z-index:1}
+#hv{width:100%;height:100%;object-fit:cover;filter:brightness(.65)}
+.hcon{position:relative;z-index:2;text-align:center;max-width:800px;padding:40px 22px}
+.ew{display:inline-flex;align-items:center;gap:7px;background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:30px;padding:6px 18px;font-size:12px;font-weight:600;color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin-bottom:26px;animation:fadeIn .8s .2s both}
+.ew::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite}
+.hero h1{font-family:var(--ffm);font-size:clamp(36px,7vw,74px);font-weight:900;line-height:1.06;margin-bottom:20px;animation:fadeUp .8s .3s both}
+.hero h1 em{font-style:italic;color:var(--amber);text-shadow:0 0 40px rgba(232,160,32,.45)}
+.hero p{font-size:clamp(15px,2.2vw,18px);color:rgba(232,238,245,.72);max-width:560px;margin:0 auto 34px;font-weight:300;line-height:1.7;animation:fadeUp .8s .4s both}
+.hcta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .8s .5s both}
+.hscr{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--muted);font-size:11px;letter-spacing:.1em;cursor:pointer;animation:fadeIn 1s 1s both}
+.sarr{width:22px;height:36px;border:2px solid var(--muted2);border-radius:11px;display:flex;align-items:flex-start;justify-content:center;padding-top:5px}
+.sdot{width:4px;height:7px;background:var(--amber);border-radius:2px;animation:bob 1.6s ease infinite}
+
+/* stats band */
+.sband{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr)}
+.sbi{padding:26px 18px;text-align:center;border-right:1px solid var(--border)}.sbi:last-child{border-right:none}
+.sbn{font-family:var(--ffm);font-size:36px;font-weight:700;color:var(--amber);line-height:1;margin-bottom:4px}
+.sbl{font-size:12px;color:var(--muted);font-weight:500}
+
+/* features */
+.fsec{padding:90px 22px;max-width:1180px;margin:0 auto}
+.slbl{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
+.stit{font-family:var(--ffm);font-size:clamp(26px,4vw,44px);font-weight:700;margin-bottom:14px;line-height:1.15}
+.ssub{font-size:15px;color:var(--muted);max-width:520px;font-weight:300;line-height:1.7;margin-bottom:50px}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.fc{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:26px;transition:all .3s;position:relative;overflow:hidden}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:0;transition:opacity .3s}
+.fc:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,0,0,.4)}.fc:hover::before{opacity:1}
+.fic{width:46px;height:46px;border-radius:var(--r2);background:var(--abg);border:1px solid rgba(232,160,32,.2);display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:16px}
+.fc h3{font-size:15px;font-weight:700;margin-bottom:8px}.fc p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* how it works */
+.hwsec{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:80px 22px}
+.hwin{max-width:980px;margin:0 auto;text-align:center}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);margin-top:52px;position:relative}
+.steps::before{content:'';position:absolute;top:22px;left:10%;right:10%;height:1px;background:var(--border2)}
+.step{position:relative;z-index:1;text-align:center;padding:0 10px}
+.snum{width:46px;height:46px;border-radius:50%;background:var(--card);border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;font-family:var(--ffc);font-size:14px;font-weight:600;color:var(--amber);margin:0 auto 14px}
+.step h4{font-size:13px;font-weight:700;margin-bottom:5px}.step p{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* pricing */
+.psec{padding:90px 22px;max-width:960px;margin:0 auto}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:46px}
+.pc{background:var(--card);border:1px solid var(--border);border-radius:var(--r3);padding:34px;position:relative}
+.pc.feat{border-color:var(--amber);background:linear-gradient(145deg,var(--card),rgba(232,160,32,.04));box-shadow:0 0 60px rgba(232,160,32,.1)}
+.ptag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--amber);color:#000;font-size:11px;font-weight:700;padding:4px 16px;border-radius:20px;letter-spacing:.06em;white-space:nowrap}
+.pnm{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.ppr{font-family:var(--ffm);font-size:40px;font-weight:700;color:var(--amber);line-height:1;margin-bottom:4px}
+.ppr sub{font-size:16px;vertical-align:super}.ppr small{font-size:14px;color:var(--muted);font-family:var(--ff);font-weight:400}
+.pdsc{font-size:13px;color:var(--muted);margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--border)}
+.pfl{list-style:none;margin-bottom:26px}
+.pfl li{display:flex;align-items:flex-start;gap:9px;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.pfl li:last-child{border-bottom:none}
+.ck{color:var(--green);flex-shrink:0}.xk{color:var(--muted2);flex-shrink:0}.lk{color:var(--muted2)}
+.lft{background:var(--surface);border-top:1px solid var(--border);padding:44px 22px;text-align:center}
+.lft p{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* ── APP SHELL ── */
+#shell{display:none;padding-top:60px;min-height:100vh}
+#shell.on{display:flex}
+#sb{width:232px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;transition:transform .25s}
+.su{padding:18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
+.snm{font-size:13px;font-weight:700}.spl{font-size:11px;color:var(--amber);font-family:var(--ffc)}
+.snl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);padding:14px 10px 5px}
+.sni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.sni:hover{color:var(--text);background:var(--border)}.sni.on{color:var(--amber);background:var(--abg);font-weight:600}
+.sni .ic{font-size:15px;width:20px;text-align:center}
+.sbot{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border)}
+.upgb{background:linear-gradient(135deg,var(--abg),var(--tbg));border:1px solid rgba(232,160,32,.25);border-radius:var(--r);padding:13px;text-align:center}
+.upgb h4{font-size:12px;font-weight:700;color:var(--amber);margin-bottom:3px}.upgb p{font-size:11px;color:var(--muted);margin-bottom:9px}
+#main{flex:1;overflow-x:hidden;min-width:0}
+.panel{display:none;padding:26px;animation:fadeUp .3s ease}.panel.on{display:block}
+.phdr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.ptit{font-family:var(--ffm);font-size:26px;font-weight:700}.psb{font-size:13px;color:var(--muted);margin-top:3px}
+
+/* dash stats */
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:18px;border-top:3px solid;transition:transform .2s}
+.sc:hover{transform:translateY(-2px)}
+.sc:nth-child(1){border-top-color:var(--amber)}.sc:nth-child(2){border-top-color:var(--teal)}.sc:nth-child(3){border-top-color:var(--green)}.sc:nth-child(4){border-top-color:var(--purple)}
+.scl{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
+.scv{font-family:var(--ffc);font-size:28px;font-weight:600;line-height:1;margin-bottom:3px}.scs{font-size:12px;color:var(--muted)}
+.dg{display:grid;grid-template-columns:3fr 2fr;gap:18px;margin-bottom:18px}
+.pb{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:6px}
+.pbf{height:100%;border-radius:3px;background:var(--amber);transition:width .6s}
+.pi{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.pi:last-child{border-bottom:none}
+.pic{width:38px;height:38px;border-radius:var(--r);background:linear-gradient(135deg,var(--abg),rgba(155,93,229,.2));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.pin{flex:1;min-width:0}
+.pit{font-size:13px;font-weight:700;margin-bottom:3px;cursor:pointer;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pit:hover{color:var(--amber)}
+.pim{font-size:11px;color:var(--muted);font-family:var(--ffc);margin-bottom:4px}
+
+/* ai quick chat */
+.aichat{max-height:210px;overflow-y:auto;margin-bottom:10px}
+.am{padding:9px 13px;border-radius:var(--r);font-size:13px;margin-bottom:7px;line-height:1.55}
+.am.u{background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.15)}
+.am.b{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--teal)}
+.airow{display:flex;gap:8px}.airow input{border-radius:var(--r)!important}
+.aisnd{background:var(--teal);border:none;color:#000;width:38px;height:38px;border-radius:var(--r);font-size:15px;cursor:pointer;flex-shrink:0;transition:all .2s}
+.aisnd:hover{background:#18a892;transform:scale(1.05)}
+.cb{position:relative;height:200px}
+
+/* activity */
+.ai2{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start}
+.ai2:last-child{border-bottom:none}
+.ad{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.at{font-size:12px;line-height:1.5}.atm{font-family:var(--ffc);font-size:10px;color:var(--muted);margin-top:1px}
+
+/* projects */
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.prc{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:22px;transition:all .25s;cursor:pointer}
+.prc:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.prch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.pric{width:42px;height:42px;border-radius:var(--r);background:linear-gradient(135deg,var(--abg),var(--tbg));display:flex;align-items:center;justify-content:center;font-size:19px}
+.prt{font-size:14px;font-weight:700;margin-bottom:7px;line-height:1.35}
+.prm{font-size:12px;color:var(--muted);margin-bottom:12px}
+.prs{display:flex;gap:14px;font-family:var(--ffc);font-size:11px;padding-top:12px;border-top:1px solid var(--border)}
+.prsn{font-size:18px;font-weight:600;color:var(--text)}.prsl{color:var(--muted);font-size:10px}
+
+/* form builder */
+.qb{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;transition:border-color .2s}
+.qb:hover{border-color:var(--border2)}
+.qbh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qbn{font-family:var(--ffc);font-size:11px;color:var(--amber);font-weight:600}
+.qbd{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;border-radius:4px}
+.qbd:hover{color:var(--rose)}
+.aqr{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
+.aqb{font-size:12px;font-weight:600;padding:7px 14px;border-radius:20px;background:var(--surface);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s}
+.aqb:hover{border-color:var(--amber);color:var(--amber)}
+.shlnk{background:var(--surface);border:1px solid var(--teal);border-radius:var(--r);padding:14px;margin-top:18px;display:flex;align-items:center;gap:10px}
+.shlnk input{background:transparent;border:none;font-family:var(--ffc);font-size:12px;color:var(--teal);padding:0;width:100%}
+
+/* analysis */
+.agr{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+.qa{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:22px}
+.qaq{font-size:13px;font-weight:700;margin-bottom:14px;line-height:1.4}
+.fr{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}.fr:last-child{border-bottom:none}
+.fl{font-size:12px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fbw{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.fbf{height:100%;border-radius:4px;background:var(--amber);transition:width .8s ease}
+.fpc{font-family:var(--ffc);font-size:11px;color:var(--amber);width:38px;text-align:right;flex-shrink:0}
+.fct{font-family:var(--ffc);font-size:11px;color:var(--muted);width:26px;text-align:right;flex-shrink:0}
+
+/* report */
+.rp{background:#fff;color:#222;border-radius:var(--r);padding:44px;box-shadow:0 4px 24px rgba(0,0,0,.5);font-family:Georgia,serif;line-height:1.8;font-size:13px}
+.ru{text-align:center;font-size:12px;color:#555;margin-bottom:3px;text-transform:uppercase;letter-spacing:.1em}
+.rtit{text-align:center;font-size:20px;font-weight:700;margin-bottom:7px;line-height:1.35;color:#000}
+.rsub{text-align:center;font-size:13px;color:#555;margin-bottom:30px}
+.rdv{border:none;border-top:2px solid #000;margin:22px 0}
+.rh1{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:26px 0 10px;color:#000}
+.rh2{font-size:14px;font-weight:700;margin:18px 0 7px;color:#000}
+.rpa{font-size:13px;color:#222;margin-bottom:11px;text-align:justify}
+.rtg{display:inline-block;background:#f0f0f0;border:1px solid #ddd;font-size:11px;padding:2px 7px;border-radius:3px;font-family:monospace}
+
+/* AI page */
+.aic{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.aihd{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px}
+.aiav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.tcs{padding:11px 22px;display:flex;gap:8px;flex-wrap:wrap;background:var(--surface);border-bottom:1px solid var(--border)}
+.tc{font-size:11px;font-weight:600;padding:5px 11px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s}
+.tc:hover,.tc.on{background:var(--abg);border-color:var(--amber);color:var(--amber)}
+.aimg{height:380px;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:13px}
+.am2{display:flex;gap:10px;max-width:88%}
+.am2.um{margin-left:auto;flex-direction:row-reverse}
+.amav{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px}
+.amav.bav{background:linear-gradient(135deg,var(--teal),var(--blue))}.amav.uav{background:linear-gradient(135deg,var(--amber),var(--rose))}
+.ambl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:11px 14px;font-size:13px;line-height:1.6;white-space:pre-line}
+.um .ambl{background:var(--abg);border-color:rgba(232,160,32,.2)}
+.aiinp{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:9px}
+.aiinp input{flex:1}
+
+/* admin */
+.atbs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.atb{font-size:13px;font-weight:600;padding:8px 18px;border-radius:var(--r);background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s}
+.atb.on{background:var(--amber);border-color:var(--amber);color:#000}
+.apn{display:none}.apn.on{display:block}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-family:var(--ffc);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:9px 13px;text-align:left;border-bottom:2px solid var(--border);background:var(--surface)}
+td{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.04)}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+/* empty */
+.emp{text-align:center;padding:48px 20px}
+.empic{font-size:44px;margin-bottom:10px}.empt{font-size:15px;font-weight:700;margin-bottom:5px}.emps{font-size:13px;color:var(--muted)}
+
+/* responsive */
+@media(max-width:1100px){.sr{grid-template-columns:repeat(2,1fr)}.dg{grid-template-columns:1fr}.agr{grid-template-columns:1fr}.fgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){
+  #nav{padding:0 14px}.hbg{display:block}
+  .nl{display:none!important}.nl.show{display:block!important}
+  #sb{display:none;position:fixed;z-index:400;top:60px;height:calc(100vh - 60px);box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  #sb.open{display:flex;flex-direction:column}
+  .panel{padding:16px}.sband{grid-template-columns:1fr 1fr}
+  .pgrid{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}
+  .steps::before{display:none}.fgrid{grid-template-columns:1fr}
+  .sr{grid-template-columns:1fr 1fr}.pg{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}.rp{padding:22px}
+  .agr{grid-template-columns:1fr}.hcta{flex-direction:column;align-items:center}
+}
+@media(max-width:480px){.sr{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="toasts"></div>
+
+<!-- ════ NAV ════ -->
+<nav id="nav">
+  <button class="brand" onclick="goBrand()">📚 <div>Tafiti Pro<small>by PabloCodeRoom</small></div></button>
+  <button class="nl" id="nlD"  onclick="go('dash')">Dashboard</button>
+  <button class="nl" id="nlP"  onclick="go('projects')">Projects</button>
+  <button class="nl" id="nlAI" onclick="go('ai')">AI Assistant</button>
+  <button class="nl" id="nlPr" onclick="go('pricing2')">Pricing</button>
+  <button class="nl" id="nlAd" onclick="go('admin')">Admin</button>
+  <div id="authBtns">
+    <button class="btn btn-g btn-sm" onclick="openM('loginM')">Sign In</button>
+    <button class="btn btn-a btn-sm" onclick="openM('regM')">Register Free</button>
+  </div>
+  <div id="userArea">
+    <button class="btn btn-g btn-sm" onclick="logout()">Sign Out</button>
+    <div class="navav" id="navAv" onclick="go('dash')" title="Dashboard">U</div>
+  </div>
+  <button class="hbg" onclick="toggleSB()">☰</button>
+</nav>
+
+<!-- ════ LANDING ════ -->
+<div id="landing">
+  <section class="hero">
+    <div class="hvw">
+      <video id="hv" autoplay muted loop playsinline preload="auto"
+        poster="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1400&q=80">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-student-reading-a-book-in-a-library-4772-large.mp4" type="video/mp4"/>
+      </video>
+    </div>
+    <div class="hcon">
+      <div class="ew">🇹🇿 Built for Tanzanian University Students</div>
+      <h1>Your Final Year<br/><em>Research</em> Made Easy</h1>
+      <p>The complete platform that guides you from research planning all the way to your final printed report — with AI help, automatic data analysis, and one-click report generation.</p>
+      <div class="hcta">
+        <button class="btn btn-a btn-lg" onclick="openM('regM')">🚀 Register Free — Start Now</button>
+        <button class="btn btn-g btn-lg" onclick="scrollF()">See How It Works ↓</button>
+      </div>
+    </div>
+    <div class="hscr" onclick="scrollF()">
+      <span>SCROLL</span><div class="sarr"><div class="sdot"></div></div>
+    </div>
+  </section>
+
+  <div class="sband">
+    <div class="sbi"><div class="sbn" id="c1">0</div><div class="sbl">Students Registered</div></div>
+    <div class="sbi"><div class="sbn" id="c2">0</div><div class="sbl">Projects Created</div></div>
+    <div class="sbi"><div class="sbn" id="c3">0</div><div class="sbl">Responses Collected</div></div>
+    <div class="sbi"><div class="sbn" id="c4">0</div><div class="sbl">Reports Generated</div></div>
+  </div>
+
+  <section class="fsec" id="featS">
+    <div class="slbl">Everything You Need</div>
+    <h2 class="stit">Powerful Tools for<br/>Serious Research</h2>
+    <p class="ssub">From your first research idea all the way to your final submitted report — Tafiti Pro handles every single step.</p>
+    <div class="fgrid">
+      <div class="fc"><div class="fic">📋</div><h3>Research Project Setup</h3><p>Register your project with title, problem statement, objectives, research questions and methodology all in one place.</p></div>
+      <div class="fc"><div class="fic">🛠️</div><h3>Smart Form Builder</h3><p>Create professional questionnaires with multiple choice, rating scales, Yes/No, Likert, and open-ended questions. Share via one link.</p></div>
+      <div class="fc"><div class="fic">📊</div><h3>Automatic Data Analysis</h3><p>Frequency distribution, percentage analysis, and beautiful charts auto-generated as responses arrive. No Excel formulas needed.</p></div>
+      <div class="fc"><div class="fic">🤖</div><h3>AI Research Assistant</h3><p>Improve your research questions, get literature review ideas, methodology suggestions, and help writing discussion chapters.</p></div>
+      <div class="fc"><div class="fic">📄</div><h3>Auto Report Generator</h3><p>Generate a complete 5-chapter research report — Introduction, Literature Review, Methodology, Results, and Conclusion with one click.</p></div>
+      <div class="fc"><div class="fic">🔒</div><h3>Secure &amp; Private</h3><p>Your research data is encrypted. JWT authentication keeps your account safe. Your data belongs only to you.</p></div>
+    </div>
+  </section>
+
+  <section class="hwsec">
+    <div class="hwin">
+      <div class="slbl" style="text-align:center">Simple Process</div>
+      <h2 class="stit" style="text-align:center">How It Works in 5 Steps</h2>
+      <div class="steps">
+        <div class="step"><div class="snum">1</div><h4>Register &amp; Setup</h4><p>Create account and set up your research project</p></div>
+        <div class="step"><div class="snum">2</div><h4>Build Your Form</h4><p>Design questionnaire and share the link</p></div>
+        <div class="step"><div class="snum">3</div><h4>Collect Data</h4><p>Respondents fill your survey online</p></div>
+        <div class="step"><div class="snum">4</div><h4>Analyze Results</h4><p>View automatic charts and statistics</p></div>
+        <div class="step"><div class="snum">5</div><h4>Generate Report</h4><p>Export your complete research report</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="psec" id="lPricing">
+    <div class="slbl">Pricing</div>
+    <h2 class="stit">Simple Pricing in Tanzania Shillings</h2>
+    <p class="ssub">Start completely free. Upgrade when you need AI report writing and advanced features.</p>
+    <div class="pgrid">
+      <div class="pc">
+        <div class="pnm">Free Plan</div><div class="ppr"><sub>TZS</sub>0<small>/forever</small></div>
+        <p class="pdsc">Perfect for getting started with your research.</p>
+        <ul class="pfl">
+          <li><span class="ck">✓</span>1 Research Project</li>
+          <li><span class="ck">✓</span>Form Builder (10 questions)</li>
+          <li><span class="ck">✓</span>Online Survey Link</li>
+          <li><span class="ck">✓</span>Response Collection (100 max)</li>
+          <li><span class="ck">✓</span>Basic Charts &amp; Analysis</li>
+          <li><span class="ck">✓</span>Excel Export</li>
+          <li><span class="ck">✓</span>AI Assistant (5 messages/day)</li>
+          <li><span class="xk lk">✗</span><span class="lk">AI Report Writing</span></li>
+          <li><span class="xk lk">✗</span><span class="lk">PDF / Word Export</span></li>
+        </ul>
+        <button class="btn btn-g wf" onclick="openM('regM')">Get Started Free</button>
+      </div>
+      <div class="pc feat">
+        <div class="ptag">⭐ MOST POPULAR</div>
+        <div class="pnm">Premium Plan</div><div class="ppr"><sub>TZS</sub>25,000<small>/month</small></div>
+        <p class="pdsc">Full AI power for your final year project.</p>
+        <ul class="pfl">
+          <li><span class="ck">✓</span>Unlimited Projects &amp; Questions</li>
+          <li><span class="ck">✓</span>Unlimited Responses</li>
+          <li><span class="ck">✓</span>Advanced Statistical Analysis</li>
+          <li><span class="ck">✓</span>Unlimited AI Assistance</li>
+          <li><span class="ck">✓</span>AI Literature Review Generator</li>
+          <li><span class="ck">✓</span>AI Discussion &amp; Conclusion Writing</li>
+          <li><span class="ck">✓</span>Auto 5-Chapter Report Generation</li>
+          <li><span class="ck">✓</span>PDF &amp; Word Document Export</li>
+          <li><span class="ck">✓</span>Annual: TZS 200,000 (save TZS 100,000)</li>
+        </ul>
+        <button class="btn btn-a wf" onclick="openM('payM')">Upgrade — TZS 25,000/mo</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="lft" id="mainFooter">
+    <div style="font-family:var(--ffm);font-size:22px;font-weight:700;color:var(--amber);margin-bottom:8px">📚 Tafiti Pro</div>
+    <p>The #1 Research Platform for Tanzanian University Students</p>
+    <p style="margin-top:8px">All prices in Tanzania Shillings (TZS)</p>
+    <p style="margin-top:10px;font-size:14px;font-weight:600;color:var(--amber)">Made by PabloCodeRoom 🚀</p>
+  </footer>
+</div>
+
+<!-- ════ APP SHELL ════ -->
+<div id="shell">
+  <aside id="sb">
+    <div class="su">
+      <div class="sav" id="sav">A</div>
+      <div><div class="snm" id="snm">Student</div><div class="spl" id="spl">FREE PLAN</div></div>
+    </div>
+    <nav style="padding:10px 8px;flex:1">
+      <div class="snl">Main</div>
+      <button class="sni on"  id="siD"  onclick="go('dash')"><span class="ic">▣</span>Dashboard</button>
+      <button class="sni"     id="siP"  onclick="go('projects')"><span class="ic">📋</span>My Projects</button>
+      <button class="sni"     id="siF"  onclick="go('form')"><span class="ic">🛠️</span>Form Builder</button>
+      <button class="sni"     id="siA"  onclick="go('analysis')"><span class="ic">📊</span>Analysis</button>
+      <button class="sni"     id="siR"  onclick="go('report')"><span class="ic">📄</span>Reports</button>
+      <div class="snl">Tools</div>
+      <button class="sni"     id="siAI" onclick="go('ai')"><span class="ic">🤖</span>AI Assistant</button>
+      <button class="sni"     id="siPr" onclick="go('pricing2')"><span class="ic">💳</span>Upgrade Plan</button>
+      <button class="sni hide" id="siAd" onclick="go('admin')"><span class="ic">⚙️</span>Admin Panel</button>
+    </nav>
+    <div class="sbot">
+      <div class="upgb" id="upgb">
+        <h4>🚀 Go Premium</h4>
+        <p>Unlock AI reports &amp; advanced analysis</p>
+        <button class="btn btn-a btn-sm wf" onclick="openM('payM')">TZS 25,000/mo</button>
+      </div>
+    </div>
+  </aside>
+
+  <main id="main">
+
+    <!-- DASHBOARD -->
+    <div class="panel on" id="pDash">
+      <div class="phdr">
+        <div><h1 class="ptit" id="dGrt">Good morning 👋</h1><p class="psb" id="dDt">Loading...</p></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <button class="btn btn-g btn-sm" onclick="excelEx()">⬇ Export Excel</button>
+          <button class="btn btn-a btn-sm" onclick="openM('projM')">+ New Project</button>
+        </div>
+      </div>
+      <div class="card" id="premB" style="background:linear-gradient(135deg,rgba(232,160,32,.1),rgba(31,184,160,.07));border-color:rgba(232,160,32,.3);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div><div style="font-size:15px;font-weight:700;color:var(--amber);margin-bottom:3px">🔓 Unlock AI Report Generation</div><div style="font-size:13px;color:var(--muted)">Automatically write your full 5-chapter research report — TZS 25,000/month</div></div>
+        <button class="btn btn-a btn-sm" onclick="openM('payM')">Upgrade Now</button>
+      </div>
+      <div class="sr">
+        <div class="sc"><div class="scl">Total Responses</div><div class="scv" id="dR" style="color:var(--amber)">0</div><div class="scs">Across all forms</div></div>
+        <div class="sc"><div class="scl">Active Projects</div><div class="scv" id="dP" style="color:var(--teal)">0</div><div class="scs">In progress</div></div>
+        <div class="sc"><div class="scl">Forms Created</div><div class="scv" id="dF" style="color:var(--green)">0</div><div class="scs">Survey forms</div></div>
+        <div class="sc"><div class="scl">Avg. Progress</div><div class="scv" id="dPr" style="color:var(--purple)">0%</div><div class="scs">Completion</div></div>
+      </div>
+      <div class="dg">
+        <div class="card">
+          <div class="ch"><span class="ct">📋 My Projects</span><button class="btn btn-g btn-sm" onclick="go('projects')">View All</button></div>
+          <div id="dProjs"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="card">
+            <div class="ch"><span class="ct">🤖 AI Assistant</span><span style="font-size:11px;color:var(--green);font-family:var(--ffc)">● Online</span></div>
+            <div class="aichat" id="dAiMsgs"><div class="am b">Hello! I'm your AI research assistant. Ask me anything about your research. How can I help today?</div></div>
+            <div class="airow">
+              <input type="text" id="dAiIn" placeholder="Ask about your research..." onkeydown="if(event.key==='Enter')dSend()"/>
+              <button class="aisnd" onclick="dSend()">➤</button>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:var(--ffc)">5 free messages remaining today</div>
+          </div>
+          <div class="card">
+            <div class="ch"><span class="ct">🕐 Recent Activity</span></div>
+            <div id="dAct"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">📈 Response Trend — Last 14 Days</span><span class="badge ba">Live</span></div>
+        <div class="cb"><canvas id="rChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="panel" id="pProjects">
+      <div class="phdr">
+        <div><h1 class="ptit">My Research Projects</h1><p class="psb">Manage all your final year research projects</p></div>
+        <button class="btn btn-a" onclick="openM('projM')">+ New Project</button>
+      </div>
+      <div class="pg" id="pGrid"></div>
+    </div>
+
+    <!-- FORM BUILDER -->
+    <div class="panel" id="pForm">
+      <div class="phdr">
+        <div><h1 class="ptit">Form Builder</h1><p class="psb">Create your research questionnaire and share it online</p></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <button class="btn btn-g" onclick="prevForm()">👁 Preview</button>
+          <button class="btn btn-a" onclick="saveForm()">💾 Save &amp; Get Link</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ig"><label>Form Title <span class="req">*</span></label><input type="text" id="fbT" placeholder="e.g. Student Survey on Social Media Usage"/></div>
+        <div class="ig"><label>Description <span class="opt">(optional)</span></label><input type="text" id="fbD" placeholder="Brief description of this survey"/></div>
+        <div id="qCon"></div>
+        <div class="aqr">
+          <span style="font-size:13px;color:var(--muted);font-weight:600;align-self:center">Add Question:</span>
+          <button class="aqb" onclick="addQ('mc')">☑ Multiple Choice</button>
+          <button class="aqb" onclick="addQ('rating')">⭐ Rating Scale</button>
+          <button class="aqb" onclick="addQ('open')">✏️ Open Ended</button>
+          <button class="aqb" onclick="addQ('yn')">✅ Yes / No</button>
+          <button class="aqb" onclick="addQ('likert')">📊 Likert Scale</button>
+        </div>
+        <div id="shBox" class="hide">
+          <div class="shlnk">
+            <span style="font-size:18px">🔗</span>
+            <div style="flex:1"><div style="font-size:12px;color:var(--teal);font-weight:600;margin-bottom:3px">Your Survey Share Link</div><input type="text" id="shIn" readonly/></div>
+            <button class="btn btn-t btn-sm" onclick="cpLink()">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div class="panel" id="pAnalysis">
+      <div class="phdr">
+        <div><h1 class="ptit">Data Analysis</h1><p class="psb">Statistical analysis of your collected responses</p></div>
+        <button class="btn btn-a" onclick="excelEx()">⬇ Export Excel</button>
+      </div>
+      <div class="sr">
+        <div class="sc"><div class="scl">Total Responses</div><div class="scv" style="color:var(--amber)">47</div><div class="scs">Collected</div></div>
+        <div class="sc"><div class="scl">Completion Rate</div><div class="scv" style="color:var(--teal)">91%</div><div class="scs">Fully complete</div></div>
+        <div class="sc"><div class="scl">Avg. Response Time</div><div class="scv" style="color:var(--green)">4.2<span style="font-size:13px">min</span></div><div class="scs">Per respondent</div></div>
+        <div class="sc"><div class="scl">Questions</div><div class="scv" style="color:var(--purple)">6</div><div class="scs">Analyzed</div></div>
+      </div>
+      <div class="agr">
+        <div class="qa"><div class="qaq">Q1: What is your gender?</div><div id="fq1"></div><div class="cb" style="height:150px;margin-top:14px"><canvas id="cq1"></canvas></div></div>
+        <div class="qa"><div class="qaq">Q2: How many hours daily on social media?</div><div id="fq2"></div></div>
+        <div class="qa"><div class="qaq">Q3: Rate how social media affects your studies (1=None, 5=Very Much)</div><div class="cb" style="height:160px"><canvas id="cq3"></canvas></div></div>
+        <div class="qa"><div class="qaq">Q4: Do you use social media during class time?</div><div id="fq4"></div></div>
+      </div>
+    </div>
+
+    <!-- REPORT -->
+    <div class="panel" id="pReport">
+      <div class="phdr">
+        <div><h1 class="ptit">Research Report</h1><p class="psb">Preview and export your full research report</p></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <button class="btn btn-g" onclick="genRpt()">🤖 Generate with AI</button>
+          <button class="btn btn-a" onclick="dlPDF()">⬇ Download PDF</button>
+          <button class="btn btn-g" onclick="dlWord()">📝 Download Word</button>
+        </div>
+      </div>
+      <div class="rp">
+        <div class="ru">University of Dar es Salaam</div>
+        <div class="ru" style="font-size:11px">Faculty of Science and Technology</div>
+        <hr class="rdv"/>
+        <div class="rtit" id="rTit">Impact of Social Media on Academic Performance Among Undergraduate Students</div>
+        <div class="rsub">A Research Report Submitted in Partial Fulfillment of the Requirements for the Award of Bachelor of Science Degree</div>
+        <div style="text-align:center;font-size:12px;color:#555;margin-top:10px">By: <strong id="rAuth">Student Name</strong></div>
+        <div style="text-align:center;font-size:11px;color:#777;margin-top:3px" id="rDt">March 2025</div>
+        <hr class="rdv"/>
+        <div class="rh1">Chapter 1: Introduction</div>
+        <div class="rh2">1.1 Background of the Study</div>
+        <p class="rpa">Social media platforms have become an integral part of daily life for university students in Tanzania. With widespread adoption of smartphones and affordable mobile data, platforms such as WhatsApp, Facebook, Instagram, and TikTok have transformed how young people communicate, access information, and spend their leisure time.</p>
+        <div class="rh2">1.2 Problem Statement</div>
+        <p class="rpa">Despite growing prevalence of social media among Tanzanian students, limited empirical research exists examining the specific relationship between social media usage patterns and academic outcomes within the Tanzanian higher education context.</p>
+        <div class="rh2">1.3 Research Objectives</div>
+        <p class="rpa">The study aims to: (i) Determine patterns of social media usage among undergraduate students. (ii) Examine the relationship between daily social media usage and academic performance (GPA). (iii) Identify platforms most used during academic activities. (iv) Recommend strategies to support academic performance.</p>
+        <hr class="rdv"/>
+        <div class="rh1">Chapter 2: Literature Review</div>
+        <div class="rh2">2.1 Theoretical Framework</div>
+        <p class="rpa">This study is grounded in the <em>Uses and Gratifications Theory</em> (Katz, Blumler &amp; Gurevitch, 1973), which posits that individuals actively select media to satisfy specific needs including information, entertainment, personal identity, and social interaction.</p>
+        <hr class="rdv"/>
+        <div class="rh1">Chapter 3: Methodology</div>
+        <div class="rh2">3.1 Research Design</div>
+        <p class="rpa">This study adopted a <span class="rtg">Quantitative</span> descriptive correlational research design. Data was collected using a structured questionnaire administered through the Tafiti Pro online platform.</p>
+        <div class="rh2">3.2 Population and Sampling</div>
+        <p class="rpa">Using Krejcie and Morgan's (1970) formula, a sample of <strong>150 students</strong> was selected using stratified random sampling from the University of Dar es Salaam.</p>
+        <hr class="rdv"/>
+        <div class="rh1">Chapter 4: Results</div>
+        <div class="rh2">4.1 Key Findings</div>
+        <p class="rpa"><strong>78.7%</strong> of students spend more than 3 hours daily on social media. WhatsApp was most used (94.4%), followed by YouTube (72.3%) and Instagram (61.7%). Pearson's correlation revealed a statistically significant negative correlation between social media usage and GPA (r = −0.47, p &lt; 0.01).</p>
+        <hr class="rdv"/>
+        <div class="rh1">Chapter 5: Conclusion</div>
+        <div class="rh2">5.1 Conclusions &amp; Recommendations</div>
+        <p class="rpa">This study established that excessive social media usage has a statistically significant negative impact on academic performance. Students should adopt intentional digital wellness strategies. Universities should develop digital literacy programmes and clear policies regarding smartphone use during lectures.</p>
+        <hr class="rdv"/>
+        <div class="rh2">References</div>
+        <p class="rpa" style="font-size:12px">Junco, R. (2012). Too much face and not enough books. <em>Computers in Human Behavior</em>, 28(1), 187–198.<br/><br/>Katz, E., Blumler, J. G., &amp; Gurevitch, M. (1973). Uses and gratifications research. <em>The Public Opinion Quarterly</em>, 37(4), 509–523.<br/><br/>TCRA. (2023). <em>Quarterly Statistics Report Q4 2023</em>. Dar es Salaam.</p>
+      </div>
+    </div>
+
+    <!-- AI ASSISTANT -->
+    <div class="panel" id="pAI">
+      <div class="phdr">
+        <div><h1 class="ptit">AI Research Assistant</h1><p class="psb">Expert research guidance — available 24/7</p></div>
+        <span class="badge ba">5 free messages/day</span>
+      </div>
+      <div class="aic">
+        <div class="aihd">
+          <div class="aiav">🤖</div>
+          <div><div style="font-weight:700;font-size:14px">Research AI Assistant</div><div style="font-size:11px;color:var(--green);font-family:var(--ffc)">● Always Available</div></div>
+        </div>
+        <div class="tcs">
+          <button class="tc on" data-t="general">💬 General Help</button>
+          <button class="tc" data-t="questions">🎯 Improve Questions</button>
+          <button class="tc" data-t="litreview">📚 Literature Review</button>
+          <button class="tc" data-t="methodology">🔬 Methodology</button>
+          <button class="tc" data-t="results">📊 Explain Results</button>
+          <button class="tc" data-t="conclusion">🔒 Conclusion <span class="badge ba" style="font-size:9px;padding:1px 5px;margin-left:2px">PRO</span></button>
+        </div>
+        <div class="aimg" id="aiMsgs">
+          <div class="am2">
+            <div class="amav bav">🤖</div>
+            <div class="ambl"><strong>Hello! I'm your AI Research Assistant.</strong><br/><br/>I can help you with:<br/>• 🎯 Improving your research questions<br/>• 📚 Literature review ideas and structure<br/>• 🔬 Choosing the right methodology<br/>• 📊 Understanding your data analysis results<br/>• 📝 Writing your discussion and conclusion<br/><br/>What would you like help with today?</div>
+          </div>
+        </div>
+        <div class="aiinp">
+          <input type="text" id="aiIn" placeholder="Ask anything about your research..." onkeydown="if(event.key==='Enter')aiSend()"/>
+          <button class="btn btn-t" onclick="aiSend()">Send ➤</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <div class="ch"><span class="ct">⚡ Quick Prompts — Click to Ask</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:9px">
+          <button class="btn btn-g" style="text-align:left;justify-content:flex-start;font-size:12px" onclick="qP('How do I improve my research question to be more specific and measurable?')">💡 How to improve my research question?</button>
+          <button class="btn btn-g" style="text-align:left;justify-content:flex-start;font-size:12px" onclick="qP('What is the difference between quantitative and qualitative research?')">🔬 Quantitative vs Qualitative?</button>
+          <button class="btn btn-g" style="text-align:left;justify-content:flex-start;font-size:12px" onclick="qP('How do I calculate the right sample size using Krejcie and Morgan formula?')">📐 How to calculate sample size?</button>
+          <button class="btn btn-g" style="text-align:left;justify-content:flex-start;font-size:12px" onclick="qP('What are the best academic databases to find literature for research in Tanzania?')">📚 Where to find academic literature?</button>
+          <button class="btn btn-g" style="text-align:left;justify-content:flex-start;font-size:12px" onclick="qP('How do I interpret and write about Pearson correlation results in my findings chapter?')">📊 How to interpret correlation results?</button>
+          <button class="btn btn-g" style="text-align:left;justify-content:flex-start;font-size:12px" onclick="qP('What are the key elements required in a research methodology chapter for a Tanzanian university?')">📝 What goes in methodology chapter?</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING (in-app) -->
+    <div class="panel" id="pPricing2">
+      <div class="phdr"><div><h1 class="ptit">Upgrade Your Plan</h1><p class="psb">All prices in Tanzania Shillings (TZS)</p></div></div>
+      <div class="pgrid" style="max-width:800px">
+        <div class="pc">
+          <div class="pnm">Free Plan</div><div class="ppr"><sub>TZS</sub>0<small>/forever</small></div>
+          <p class="pdsc">Your current plan.</p>
+          <ul class="pfl">
+            <li><span class="ck">✓</span>1 Project · 10 Questions · 100 Responses</li>
+            <li><span class="ck">✓</span>Basic Analysis · Excel Export</li>
+            <li><span class="ck">✓</span>5 AI messages per day</li>
+            <li><span class="xk lk">✗</span><span class="lk">AI Report Writing</span></li>
+            <li><span class="xk lk">✗</span><span class="lk">PDF / Word Export</span></li>
+          </ul>
+          <button class="btn btn-g wf" disabled>Current Plan</button>
+        </div>
+        <div class="pc feat">
+          <div class="ptag">⭐ MOST POPULAR</div>
+          <div class="pnm">Premium Plan</div><div class="ppr"><sub>TZS</sub>25,000<small>/month</small></div>
+          <p class="pdsc">Everything you need to finish on time.</p>
+          <ul class="pfl">
+            <li><span class="ck">✓</span>Unlimited Projects · Questions · Responses</li>
+            <li><span class="ck">✓</span>Advanced Statistical Analysis</li>
+            <li><span class="ck">✓</span>Unlimited AI Assistance</li>
+            <li><span class="ck">✓</span>AI Literature Review + Discussion Writing</li>
+            <li><span class="ck">✓</span>Auto 5-Chapter Report Generation</li>
+            <li><span class="ck">✓</span>PDF + Word Document Export</li>
+            <li><span class="ck">✓</span>Annual: TZS 200,000 (save TZS 100,000)</li>
+          </ul>
+          <button class="btn btn-a wf" onclick="openM('payM')">Upgrade Now — TZS 25,000/mo</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:22px;max-width:800px">
+        <div class="ct" style="margin-bottom:12px">💳 Payment Methods Accepted</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px">
+          <span>📱 M-Pesa (Vodacom)</span><span>📱 Tigo Pesa</span><span>📱 Airtel Money</span>
+          <span>💳 CRDB Bank Card</span><span>💳 NMB Bank Card</span><span>💳 Visa / Mastercard</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="panel" id="pAdmin">
+      <div class="phdr"><div><h1 class="ptit">Admin Panel</h1><p class="psb">System management and oversight</p></div></div>
+      <div class="sr" style="margin-bottom:22px">
+        <div class="sc"><div class="scl">Total Users</div><div class="scv" id="adU" style="color:var(--amber)">0</div><div class="scs">Registered</div></div>
+        <div class="sc"><div class="scl">Premium Users</div><div class="scv" id="adPr" style="color:var(--teal)">0</div><div class="scs">Paying</div></div>
+        <div class="sc"><div class="scl">Total Projects</div><div class="scv" id="adPj" style="color:var(--green)">0</div><div class="scs">Created</div></div>
+        <div class="sc"><div class="scl">Revenue (TZS)</div><div class="scv" id="adRv" style="color:var(--purple)">0</div><div class="scs">This month</div></div>
+      </div>
+      <div class="atbs">
+        <button class="atb on" onclick="aTab('u')">👥 Users</button>
+        <button class="atb" onclick="aTab('p')">📋 Projects</button>
+        <button class="atb" onclick="aTab('pay')">💳 Payments</button>
+      </div>
+      <div class="apn on card" id="apU"><table><thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Projects</th><th>Joined</th><th>Action</th></tr></thead><tbody id="adUT"></tbody></table></div>
+      <div class="apn card" id="apP"><table><thead><tr><th>Title</th><th>Student</th><th>Methodology</th><th>Responses</th><th>Status</th></tr></thead><tbody id="adPT"></tbody></table></div>
+      <div class="apn card" id="apPay"><table><thead><tr><th>Student</th><th>Amount (TZS)</th><th>Plan</th><th>Method</th><th>Date</th><th>Status</th></tr></thead><tbody id="adPayT"></tbody></table></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ════ MODALS ════ -->
+
+<!-- REGISTER -->
+<div id="regM" class="mo">
+  <div class="modal modal-lg">
+    <button class="mcls" onclick="closeM('regM')">✕</button>
+    <div class="mt">Create Your Account 🎓</div>
+    <div class="ms">Join thousands of Tanzanian students using Tafiti Pro</div>
+    <div class="ig"><label>Full Name <span class="req">*</span></label><input type="text" id="rn" placeholder="e.g. Amara Okonkwo"/></div>
+    <div class="ig"><label>Email Address <span class="req">*</span></label><input type="email" id="re" placeholder="you@university.ac.tz"/></div>
+    <div class="ig"><label>Password <span class="req">*</span></label><input type="password" id="rp" placeholder="At least 8 characters"/></div>
+    <div class="g2">
+      <div class="ig"><label>University</label><input type="text" id="ri" placeholder="e.g. UDSM, UDOM, MU"/></div>
+      <div class="ig"><label>Student ID</label><input type="text" id="rs" placeholder="e.g. 2021/BSCS/001"/></div>
+    </div>
+    <div class="ig"><label>Department / Faculty</label><input type="text" id="rd" placeholder="e.g. Computer Science"/></div>
+    <div class="ig"><label>Research Project Title <span class="req">*</span> <span class="opt">— your main final year project</span></label><input type="text" id="rpt" placeholder="e.g. Impact of Social Media on Academic Performance"/></div>
+    <div class="g2">
+      <div class="ig"><label>Methodology</label><select id="rm"><option value="quantitative">Quantitative</option><option value="qualitative">Qualitative</option><option value="mixed">Mixed Methods</option></select></div>
+      <div class="ig"><label>Target Population</label><input type="text" id="rpop" placeholder="e.g. UDSM Students"/></div>
+    </div>
+    <button class="btn btn-a wf" style="margin-top:4px" onclick="doReg()">Create Account &amp; Start Research →</button>
+    <div style="text-align:center;margin-top:13px;font-size:13px;color:var(--muted)">Already have an account? <span style="color:var(--amber);cursor:pointer;font-weight:600" onclick="closeM('regM');openM('loginM')">Sign in here</span></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginM" class="mo">
+  <div class="modal">
+    <button class="mcls" onclick="closeM('loginM')">✕</button>
+    <div class="mt">Welcome Back 👋</div>
+    <div class="ms">Sign in to continue your research</div>
+    <div class="ig"><label>Email Address</label><input type="email" id="le" placeholder="your@email.com"/></div>
+    <div class="ig" style="margin-bottom:22px"><label>Password</label><input type="password" id="lp" placeholder="Your password"/></div>
+    <button class="btn btn-a wf" onclick="doLogin()">Sign In →</button>
+    <div style="text-align:center;margin-top:13px;font-size:13px;color:var(--muted)">No account? <span style="color:var(--amber);cursor:pointer;font-weight:600" onclick="closeM('loginM');openM('regM')">Register free</span></div>
+    <div style="border-top:1px solid var(--border);margin-top:18px;padding-top:14px;font-size:12px;color:var(--muted);text-align:center">🔐 Demo: Any email &amp; password will work to explore the full system</div>
+  </div>
+</div>
+
+<!-- NEW PROJECT -->
+<div id="projM" class="mo">
+  <div class="modal modal-lg">
+    <button class="mcls" onclick="closeM('projM')">✕</button>
+    <div class="mt">New Research Project 📋</div>
+    <div class="ms">Set up your research project details below</div>
+    <div class="ig"><label>Research Title <span class="req">*</span></label><input type="text" id="nt" placeholder="e.g. Effects of Climate Change on Maize Yield in Tanzania"/></div>
+    <div class="ig"><label>Problem Statement <span class="req">*</span></label><textarea id="np" placeholder="Describe the research problem you are investigating..."></textarea></div>
+    <div class="ig"><label>Research Objectives <span class="opt">(separate with commas)</span></label><input type="text" id="no" placeholder="To determine social media use, To assess GPA correlation"/></div>
+    <div class="ig"><label>Main Research Question <span class="req">*</span></label><input type="text" id="nq" placeholder="e.g. How does social media use affect academic performance?"/></div>
+    <div class="g2">
+      <div class="ig"><label>Methodology</label><select id="nm"><option value="quantitative">Quantitative</option><option value="qualitative">Qualitative</option><option value="mixed">Mixed Methods</option></select></div>
+      <div class="ig"><label>Target Population</label><input type="text" id="npo" placeholder="e.g. UDSM Students"/></div>
+    </div>
+    <div class="g2">
+      <div class="ig"><label>Sample Size</label><input type="number" id="nss" placeholder="e.g. 150"/></div>
+      <div class="ig"><label>Data Collection Method</label><select id="nc"><option value="questionnaire">Questionnaire / Survey</option><option value="interview">Interview</option><option value="observation">Observation</option><option value="mixed">Multiple Methods</option></select></div>
+    </div>
+    <button class="btn btn-a wf" style="margin-top:4px" onclick="doProj()">Create Research Project →</button>
+  </div>
+</div>
+
+<!-- PAYMENT -->
+<div id="payM" class="mo">
+  <div class="modal">
+    <button class="mcls" onclick="closeM('payM')">✕</button>
+    <div class="mt">Upgrade to Premium ⭐</div>
+    <div class="ms">Unlock AI report generation, unlimited projects &amp; advanced analysis</div>
+    <div class="card" style="background:var(--abg);border-color:rgba(232,160,32,.3);margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:700;margin-bottom:2px">Premium Monthly Plan</div><div style="font-size:12px;color:var(--muted)">Full AI · Unlimited everything · Priority support</div></div>
+        <div style="font-family:var(--ffm);font-size:24px;font-weight:700;color:var(--amber)">TZS 25,000</div>
+      </div>
+    </div>
+    <div class="ig"><label>Payment Method</label>
+      <select id="pm" onchange="togPay()">
+        <option value="mpesa">📱 M-Pesa (Vodacom)</option><option value="tigo">📱 Tigo Pesa</option>
+        <option value="airtel">📱 Airtel Money</option><option value="crdb">💳 CRDB Bank Card</option>
+        <option value="nmb">💳 NMB Bank Card</option><option value="visa">💳 Visa / Mastercard</option>
+      </select>
+    </div>
+    <div class="ig" id="phF"><label>Mobile Number</label><input type="tel" id="pph" placeholder="e.g. 0712 345 678"/></div>
+    <div class="ig hide" id="cdF"><label>Card Number</label><input type="text" id="pcd" placeholder="1234 5678 9012 3456"/></div>
+    <button class="btn btn-a wf" style="margin-top:4px" onclick="doPay()">Pay TZS 25,000 Now →</button>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:9px">🔒 Secure payment · Cancel anytime · Instant activation</div>
+  </div>
+</div>
+
+<!-- FORM PREVIEW -->
+<div id="prevM" class="mo">
+  <div class="modal modal-lg">
+    <button class="mcls" onclick="closeM('prevM')">✕</button>
+    <div class="mt" id="pvT">Survey Preview</div>
+    <div class="ms" id="pvS">How respondents will see your survey</div>
+    <div id="pvB"></div>
+    <button class="btn btn-t wf" style="margin-top:18px" onclick="closeM('prevM')">Close Preview</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════
+// STATE
+// ════════════════════════════════════
+var U=null, PROJS=[], QS=[], AITYPE='general', CUR='dash', CHARTS={};
+
+function load(){
+  try{
+    var d=JSON.parse(localStorage.getItem('rp')||'{}');
+    U=d.u||null; PROJS=d.p||[];
+  }catch(e){}
+}
+function save(){
+  try{localStorage.setItem('rp',JSON.stringify({u:U,p:PROJS}));}catch(e){}
+}
+function getUsers(){try{return JSON.parse(localStorage.getItem('rp_u')||'[]');}catch(e){return[];}}
+function saveUsers(a){try{localStorage.setItem('rp_u',JSON.stringify(a));}catch(e){}}
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+load();
+(function init(){
+  if(U){ showShell(); }
+  else { showLanding(); }
+  // Video fallback
+  var v=document.getElementById('hv');
+  if(v) v.addEventListener('error',function(){v.style.display='none';});
+  // AI chips
+  document.querySelectorAll('.tc').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('.tc').forEach(function(x){x.classList.remove('on');});
+      c.classList.add('on'); AITYPE=c.dataset.t;
+    });
+  });
+  // Modal overlay click to close
+  document.querySelectorAll('.mo').forEach(function(o){
+    o.addEventListener('click',function(e){if(e.target===o)closeM(o.id);});
+  });
+  // Escape to close
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape') document.querySelectorAll('.mo.open').forEach(function(m){m.classList.remove('open');});
+  });
+  // Init sample questions
+  QS=[
+    {id:nid(),type:'mc',text:'What is your year of study?',opts:['Year 1','Year 2','Year 3','Year 4']},
+    {id:nid(),type:'rating',text:'How satisfied are you with the quality of teaching?',opts:[]},
+    {id:nid(),type:'yn',text:'Do you use social media during lecture time?',opts:[]},
+    {id:nid(),type:'open',text:'What recommendations do you have to improve academic performance?',opts:[]}
+  ];
+})();
+
+// ════════════════════════════════════
+// SHOW LANDING / SHELL
+// ════════════════════════════════════
+function showLanding(){
+  document.getElementById('landing').classList.add('on');
+  document.getElementById('shell').classList.remove('on');
+  document.getElementById('authBtns').style.display='flex';
+  document.getElementById('userArea').style.display='none';
+  ['nlD','nlP','nlAI','nlPr','nlAd'].forEach(function(id){
+    document.getElementById(id).classList.remove('show');
+  });
+  // Start counters when visible
+  var done=false;
+  var obs=new IntersectionObserver(function(e){
+    e.forEach(function(x){if(x.isIntersecting&&!done){done=true;cu('c1',1247);cu('c2',892);cu('c3',24500);cu('c4',312);obs.disconnect();}});
+  },{threshold:.3});
+  var sb=document.querySelector('.sband');
+  if(sb) obs.observe(sb);
+}
+
+function showShell(){
+  document.getElementById('landing').classList.remove('on');
+  document.getElementById('shell').classList.add('on');
+  document.getElementById('authBtns').style.display='none';
+  document.getElementById('userArea').style.display='flex';
+  ['nlD','nlP','nlAI','nlPr'].forEach(function(id){
+    document.getElementById(id).classList.add('show');
+  });
+  if(U.role==='admin'){
+    document.getElementById('nlAd').classList.add('show');
+    document.getElementById('siAd').classList.remove('hide');
+  }
+  document.getElementById('navAv').textContent=(U.name||'U')[0].toUpperCase();
+  document.getElementById('sav').textContent=(U.name||'U')[0].toUpperCase();
+  document.getElementById('snm').textContent=U.name||'Student';
+  document.getElementById('spl').textContent=(U.plan==='premium'?'PREMIUM':'FREE')+' PLAN';
+  if(U.plan==='premium') document.getElementById('upgb').style.display='none';
+  go(CUR||'dash');
+}
+
+function goBrand(){ if(U) go('dash'); else{ document.getElementById('landing').classList.add('on'); document.getElementById('shell').classList.remove('on'); window.scrollTo(0,0); } }
+
+// ════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════
+var PNS=['dash','projects','form','analysis','report','ai','pricing2','admin'];
+
+function go(id){
+  if(!U){ openM('loginM'); return; }
+  if(id==='admin'&&U.role!=='admin'){ toast('Admin access required','ter'); return; }
+  PNS.forEach(function(p){
+    var el=document.getElementById('p'+cap(p));
+    if(el) el.classList.remove('on');
+  });
+  var el=document.getElementById('p'+cap(id));
+  if(el) el.classList.add('on');
+  document.querySelectorAll('.sni').forEach(function(b){b.classList.remove('on');});
+  var si=document.getElementById('si'+cap(id));
+  if(si) si.classList.add('on');
+  CUR=id; window.scrollTo(0,0);
+  document.getElementById('sb').classList.remove('open');
+  if(id==='dash')     initDash();
+  if(id==='projects') renderProjs();
+  if(id==='form')     setTimeout(renderQs,50);
+  if(id==='analysis') initAnalysis();
+  if(id==='report')   initReport();
+  if(id==='admin')    initAdmin();
+}
+
+function toggleSB(){ document.getElementById('sb').classList.toggle('open'); }
+
+// ════════════════════════════════════
+// REGISTER
+// ════════════════════════════════════
+function doReg(){
+  var name=g('rn'),email=g('re'),pass=g('rp'),proj=g('rpt');
+  if(!name){  toast('Please enter your full name','ter'); return; }
+  if(!email){ toast('Please enter your email address','ter'); return; }
+  if(!pass){  toast('Please enter a password','ter'); return; }
+  if(pass.length<8){ toast('Password must be at least 8 characters','ter'); return; }
+  if(!proj){  toast('Please enter your research project title','ter'); return; }
+
+  var users=getUsers();
+  if(users.find(function(u){return u.email===email;})){
+    toast('This email is already registered — please sign in instead','ter'); return;
+  }
+  var user={id:nid(),name:name,email:email,password:pass,
+    institution:g('ri'),studentId:g('rs'),dept:g('rd'),
+    role:'student',plan:'free',createdAt:new Date().toISOString()};
+  users.push(user); saveUsers(users);
+
+  var proj={id:nid(),studentId:user.id,studentName:name,title:proj,
+    methodology:g('rm')||'quantitative',problem:'',objectives:[],
+    mainQuestion:'',targetPop:g('rpop')||'',sampleSize:0,
+    collectionMethod:'questionnaire',status:'planning',progress:15,
+    responses:0,forms:0,createdAt:new Date().toISOString()};
+  PROJS.push(proj);
+
+  U=user; save(); closeM('regM');
+  ['rn','re','rp','ri','rs','rd','rpt','rpop'].forEach(function(i){var e=document.getElementById(i);if(e)e.value='';});
+  toast('Welcome, '+name+'! 🎉 Your account is ready.','tok');
+  showShell();
+}
+
+// ════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════
+function doLogin(){
+  var email=g('le'),pass=g('lp');
+  if(!email){ toast('Please enter your email','ter'); return; }
+  if(!pass){  toast('Please enter your password','ter'); return; }
+
+  var users=getUsers();
+  var user=users.find(function(u){return u.email===email&&u.password===pass;});
+  if(!user){
+    // Demo: create on the fly
+    user={id:nid(),
+      name:email.split('@')[0].replace(/[._-]/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}),
+      email:email,password:pass,institution:'',studentId:'',dept:'',
+      role:email.toLowerCase().indexOf('admin')>=0?'admin':'student',
+      plan:'free',createdAt:new Date().toISOString()};
+    users.push(user); saveUsers(users);
+  }
+  U=user; save(); closeM('loginM');
+  document.getElementById('le').value=''; document.getElementById('lp').value='';
+  toast('Welcome back, '+U.name+'! 👋','tok');
+  showShell();
+}
+
+// ════════════════════════════════════
+// LOGOUT
+// ════════════════════════════════════
+function logout(){
+  U=null; save();
+  Object.keys(CHARTS).forEach(function(k){if(CHARTS[k]){try{CHARTS[k].destroy();}catch(e){}}CHARTS[k]=null;});
+  ['nlD','nlP','nlAI','nlPr','nlAd'].forEach(function(id){document.getElementById(id).classList.remove('show');});
+  document.getElementById('siAd').classList.add('hide');
+  showLanding();
+  toast('Signed out successfully.','tinf');
+}
+
+// ════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════
+function initDash(){
+  if(!U) return;
+  var mp=myP();
+  var h=new Date().getHours();
+  var gr=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('dGrt').innerHTML=gr+', <span style="color:var(--amber)">'+U.name.split(' ')[0]+'</span> 👋';
+  document.getElementById('dDt').textContent=new Date().toLocaleDateString('en-TZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('premB').style.display=U.plan==='premium'?'none':'flex';
+  var tr=mp.reduce(function(s,p){return s+(p.responses||0);},0);
+  var ap=mp.length?Math.round(mp.reduce(function(s,p){return s+(p.progress||0);},0)/mp.length):0;
+  cu('dR',tr); cu('dP',mp.length);
+  cu('dF',mp.reduce(function(s,p){return s+(p.forms||0);},0));
+  document.getElementById('dPr').textContent=ap+'%';
+  var pe=document.getElementById('dProjs');
+  if(!mp.length){
+    pe.innerHTML='<div class="emp"><div class="empic">📭</div><div class="empt">No Projects Yet</div><div class="emps">Click "+ New Project" to get started</div></div>';
+  } else {
+    pe.innerHTML=mp.slice(0,4).map(function(p){
+      return '<div class="pi"><div class="pic">📋</div><div class="pin">'
+        +'<div class="pit" onclick="go(\'projects\')">'+esc(p.title)+'</div>'
+        +'<div class="pim">'+cap(p.methodology||'quantitative')+' · '+(p.responses||0)+' responses · '+(p.forms||0)+' forms</div>'
+        +'<div class="pb"><div class="pbf" style="width:'+(p.progress||0)+'%"></div></div>'
+        +'</div><span class="badge '+sb(p.status)+'">'+((p.status||'planning').replace(/_/g,' '))+'</span></div>';
+    }).join('');
+  }
+  var acts=[
+    {c:'var(--green)',t:'<strong>Welcome!</strong> Your account and project are ready',time:'Just now'},
+    {c:'var(--blue)', t:'🤖 AI Assistant is online and ready to help',time:'Always available'},
+    {c:'var(--amber)',t:'📊 Analysis charts auto-generate as responses arrive',time:'Automatic'},
+    {c:'var(--teal)', t:'🔗 Survey forms generate shareable links instantly',time:'Instant'},
+  ];
+  document.getElementById('dAct').innerHTML=acts.map(function(a){
+    return '<div class="ai2"><div class="ad" style="background:'+a.c+'"></div><div><div class="at">'+a.t+'</div><div class="atm">'+a.time+'</div></div></div>';
+  }).join('');
+  setTimeout(buildChart,120);
+}
+
+function buildChart(){
+  var ctx=document.getElementById('rChart');
+  if(!ctx) return;
+  if(CHARTS.r){try{CHARTS.r.destroy();}catch(e){}}
+  var lbs=[]; for(var i=13;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);lbs.push(d.getDate()+'/'+(d.getMonth()+1));}
+  CHARTS.r=new Chart(ctx,{type:'line',data:{labels:lbs,datasets:[{label:'Responses',data:[2,5,3,8,6,11,9,14,10,7,12,15,13,8],borderColor:'#E8A020',backgroundColor:'rgba(232,160,32,0.08)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#E8A020',borderWidth:2.5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#131920',borderColor:'#1E2A38',borderWidth:1,titleColor:'#E8EEF5',bodyColor:'#6B8299'}},
+    scales:{x:{ticks:{color:'#6B8299',font:{size:10,family:'JetBrains Mono'}},grid:{color:'#1E2A38'}},y:{ticks:{color:'#6B8299'},grid:{color:'#1E2A38'},beginAtZero:true}}}});
+}
+
+function dSend(){
+  var inp=document.getElementById('dAiIn'),txt=inp.value.trim();
+  if(!txt) return;
+  var box=document.getElementById('dAiMsgs');
+  box.innerHTML+='<div class="am u">'+esc(txt)+'</div>';
+  inp.value=''; box.scrollTop=box.scrollHeight;
+  setTimeout(function(){
+    box.innerHTML+='<div class="am b">'+getAI('general',txt)+'</div>';
+    box.scrollTop=box.scrollHeight;
+  },700);
+}
+
+// ════════════════════════════════════
+// PROJECTS
+// ════════════════════════════════════
+function doProj(){
+  var title=g('nt'),prob=g('np'),q=g('nq');
+  if(!title){ toast('Project title is required','ter'); return; }
+  if(!prob){  toast('Please describe the research problem','ter'); return; }
+  var p={id:nid(),studentId:U.id,studentName:U.name,title:title,problem:prob,
+    objectives:g('no').split(',').map(function(s){return s.trim();}).filter(Boolean),
+    mainQuestion:q,methodology:g('nm')||'quantitative',
+    targetPop:g('npo'),sampleSize:parseInt(g('nss'))||0,
+    collectionMethod:g('nc'),status:'planning',progress:15,
+    responses:0,forms:0,createdAt:new Date().toISOString()};
+  PROJS.push(p); save(); closeM('projM');
+  ['nt','np','no','nq','npo','nss'].forEach(function(i){var e=document.getElementById(i);if(e)e.value='';});
+  toast('Research project created! 🎉','tok');
+  renderProjs();
+}
+
+function renderProjs(){
+  var mp=myP(), grid=document.getElementById('pGrid');
+  if(!grid) return;
+  if(!mp.length){
+    grid.innerHTML='<div class="emp" style="grid-column:1/-1"><div class="empic">🗂️</div><div class="empt">No Research Projects</div><div class="emps">Click "New Project" to create your first research project</div></div>';
+    return;
+  }
+  grid.innerHTML=mp.map(function(p){
+    return '<div class="prc"><div class="prch"><div class="pric">📋</div><span class="badge '+sb(p.status)+'">'+((p.status||'planning').replace(/_/g,' '))+'</span></div>'
+      +'<div class="prt">'+esc(p.title)+'</div>'
+      +'<div class="prm">📐 '+cap(p.methodology||'quantitative')+' · 👥 '+(p.targetPop||'N/A')+' · n='+(p.sampleSize||0)+'</div>'
+      +'<div class="pb" style="margin-bottom:14px"><div class="pbf" style="width:'+(p.progress||0)+'%"></div></div>'
+      +'<div class="prs"><div><div class="prsn">'+(p.responses||0)+'</div><div class="prsl">Responses</div></div>'
+      +'<div><div class="prsn">'+(p.forms||0)+'</div><div class="prsl">Forms</div></div>'
+      +'<div><div class="prsn">'+(p.progress||0)+'%</div><div class="prsl">Progress</div></div></div>'
+      +'<div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">'
+      +'<button class="btn btn-g btn-sm" style="flex:1" onclick="go(\'form\')">🛠 Build Form</button>'
+      +'<button class="btn btn-t btn-sm" style="flex:1" onclick="go(\'analysis\')">📊 Analysis</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+// ════════════════════════════════════
+// FORM BUILDER
+// ════════════════════════════════════
+function addQ(t){
+  QS.push({id:nid(),type:t,text:'',opts:['Option A','Option B','Option C']});
+  renderQs();
+}
+function delQ(id){ QS=QS.filter(function(q){return q.id!==id;}); renderQs(); }
+function updQ(id,v){ var q=QS.find(function(q){return q.id===id;}); if(q) q.text=v; }
+
+function renderQs(){
+  var c=document.getElementById('qCon'); if(!c) return;
+  c.innerHTML=QS.map(function(q,i){
+    var pr='';
+    if(q.type==='mc'){
+      pr=(q.opts||['A','B','C']).map(function(o){return '<div style="display:flex;align-items:center;gap:7px;padding:4px 0"><span style="color:var(--amber)">○</span><span style="font-size:13px;color:var(--muted)">'+o+'</span></div>';}).join('');
+    }else if(q.type==='yn'){
+      pr='<div style="display:flex;gap:14px"><div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)"><span style="color:var(--amber)">○</span>Yes</div><div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)"><span style="color:var(--amber)">○</span>No</div></div>';
+    }else if(q.type==='rating'){
+      pr='<div style="display:flex;gap:8px;margin-top:6px">'+[1,2,3,4,5].map(function(n){return '<div style="width:34px;height:34px;border:1.5px solid var(--border2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--ffc);font-size:12px;color:var(--muted)">'+n+'</div>';}).join('')+'</div>';
+    }else if(q.type==='likert'){
+      pr='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">'+['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'].map(function(o){return '<span style="background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:11px;padding:4px 9px;color:var(--muted)">'+o+'</span>';}).join('')+'</div>';
+    }else{
+      pr='<div style="background:var(--surface);border:1px dashed var(--border2);border-radius:6px;padding:9px 13px;font-size:13px;color:var(--muted2);margin-top:6px">Respondent types their answer here...</div>';
+    }
+    return '<div class="qb"><div class="qbh"><span class="qbn">Q'+(i+1)+' · '+qlbl(q.type)+'</span><button class="qbd" onclick="delQ(\''+q.id+'\')">🗑</button></div>'
+      +'<input type="text" value="'+esc(q.text||'')+'" onchange="updQ(\''+q.id+'\',this.value)" placeholder="Type your question here..." style="margin-bottom:9px;font-weight:600"/>'+pr+'</div>';
+  }).join('');
+}
+
+function saveForm(){
+  var t=g('fbT');
+  if(!t){ toast('Please enter a form title','ter'); return; }
+  if(!QS.length){ toast('Please add at least one question','ter'); return; }
+  var token='survey-'+Math.random().toString(36).substr(2,10);
+  var link=window.location.href.split('?')[0]+'?survey='+token;
+  document.getElementById('shIn').value=link;
+  document.getElementById('shBox').classList.remove('hide');
+  var mp=myP(); if(mp.length){mp[0].forms=(mp[0].forms||0)+1; save();}
+  toast('Form saved! Share the link with your respondents 🔗','tok');
+}
+
+function cpLink(){
+  var v=document.getElementById('shIn').value;
+  navigator.clipboard.writeText(v).then(function(){toast('Survey link copied! 📋','tok');});
+}
+
+function prevForm(){
+  document.getElementById('pvT').textContent=g('fbT')||'Survey Preview';
+  document.getElementById('pvS').textContent=g('fbD')||'Please fill out this survey carefully.';
+  var body='';
+  QS.forEach(function(q,i){
+    body+='<div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)">';
+    body+='<div style="font-size:14px;font-weight:600;margin-bottom:10px;color:var(--text)">Q'+(i+1)+'. '+(q.text||'(No question text)')+'</div>';
+    if(q.type==='yn') body+='<div style="display:flex;gap:12px"><label style="cursor:pointer;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px"><input type="radio" name="q'+i+'"/> Yes</label><label style="cursor:pointer;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px"><input type="radio" name="q'+i+'"/> No</label></div>';
+    else if(q.type==='mc') body+=(q.opts||['A','B','C']).map(function(o){return '<label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--muted);padding:5px 0"><input type="radio" name="q'+i+'"/> '+o+'</label>';}).join('');
+    else if(q.type==='rating') body+='<div style="display:flex;gap:10px">'+'12345'.split('').map(function(n,j){return '<label style="cursor:pointer;font-size:13px;text-align:center;color:var(--muted)"><input type="radio" name="q'+i+'" style="display:block;margin:0 auto 4px"/>'+(j+1)+'</label>';}).join('')+'</div>';
+    else if(q.type==='likert') body+='<div style="display:flex;gap:6px;flex-wrap:wrap">'+['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'].map(function(o){return '<label style="cursor:pointer;font-size:11px;text-align:center;background:var(--surface);border:1px solid var(--border);padding:6px 8px;border-radius:4px;color:var(--muted)"><input type="radio" name="q'+i+'" style="display:block;margin:0 auto 4px"/>'+o+'</label>';}).join('')+'</div>';
+    else body+='<textarea style="width:100%;min-height:70px;background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--ff);font-size:13px;padding:9px 13px" placeholder="Your answer..."></textarea>';
+    body+='</div>';
+  });
+  if(!QS.length) body='<div style="text-align:center;color:var(--muted);padding:24px">No questions added yet.</div>';
+  document.getElementById('pvB').innerHTML=body;
+  openM('prevM');
+}
+
+// ════════════════════════════════════
+// ANALYSIS
+// ════════════════════════════════════
+function initAnalysis(){
+  var q1=[{l:'Male',n:26,p:55.3},{l:'Female',n:21,p:44.7}];
+  var q2=[{l:'Less than 1 hour',n:4,p:8.5},{l:'1–2 hours',n:6,p:12.8},{l:'3–4 hours',n:14,p:29.8},{l:'5–6 hours',n:15,p:31.9},{l:'More than 6 hours',n:8,p:17.0}];
+  var q4=[{l:'Yes, frequently',n:11,p:23.4},{l:'Yes, sometimes',n:21,p:44.7},{l:'Rarely',n:10,p:21.3},{l:'Never',n:5,p:10.6}];
+  rFreq('fq1',q1); rFreq('fq2',q2); rFreq('fq4',q4);
+  setTimeout(function(){
+    var c1=document.getElementById('cq1');
+    if(c1){if(CHARTS.c1){try{CHARTS.c1.destroy();}catch(e){}} CHARTS.c1=new Chart(c1,{type:'doughnut',data:{labels:['Male','Female'],datasets:[{data:[55.3,44.7],backgroundColor:['#E8A020','#1FB8A0'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#E8EEF5',font:{size:11}}}}}}); }
+    var c3=document.getElementById('cq3');
+    if(c3){if(CHARTS.c3){try{CHARTS.c3.destroy();}catch(e){}} CHARTS.c3=new Chart(c3,{type:'bar',data:{labels:['1-No effect','2','3-Moderate','4','5-Very much'],datasets:[{label:'Respondents',data:[3,6,12,16,10],backgroundColor:'rgba(232,160,32,0.75)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6B8299',font:{size:10}},grid:{color:'#1E2A38'}},y:{ticks:{color:'#6B8299'},grid:{color:'#1E2A38'},beginAtZero:true}}}}); }
+  },150);
+}
+
+function rFreq(id,data){
+  var el=document.getElementById(id); if(!el) return;
+  el.innerHTML=data.map(function(d){
+    return '<div class="fr"><span class="fl">'+d.l+'</span><div class="fbw"><div class="fbf" style="width:'+d.p+'%"></div></div><span class="fpc">'+d.p+'%</span><span class="fct">'+d.n+'</span></div>';
+  }).join('');
+}
+
+// ════════════════════════════════════
+// REPORT
+// ════════════════════════════════════
+function initReport(){
+  var mp=myP();
+  if(mp.length) document.getElementById('rTit').textContent=mp[0].title;
+  document.getElementById('rAuth').textContent=U?U.name:'Student Name';
+  document.getElementById('rDt').textContent=new Date().toLocaleDateString('en-TZ',{month:'long',year:'numeric'});
+}
+function genRpt(){ initReport(); toast('Report generated! Scroll down to review. 📄','tok'); }
+function dlPDF(){ if(U&&U.plan==='premium'){toast('Downloading PDF...','tok');}else{openM('payM');toast('PDF export requires Premium — TZS 25,000/month','twarn');} }
+function dlWord(){ if(U&&U.plan==='premium'){toast('Downloading Word document...','tok');}else{openM('payM');toast('Word export requires Premium — TZS 25,000/month','twarn');} }
+
+// ════════════════════════════════════
+// AI ASSISTANT
+// ════════════════════════════════════
+var AIR={
+  general:["For your final year research, start by ensuring your topic is specific, measurable, and achievable within your timeline. Tafiti Pro can generate all 5 chapters automatically with Premium.",
+    "Use Tafiti Pro's form builder to collect your data. It automatically generates frequency tables and charts for Chapter 4 of your report — saving hours of manual Excel work."],
+  questions:["To improve your research question, use the SMART criteria:\n\n✅ Specific — clearly defined and focused\n✅ Measurable — has a quantifiable outcome\n✅ Achievable — feasible in your context\n✅ Relevant — important to your field\n✅ Time-bound — answerable within your study\n\nExample:\n❌ 'Does social media affect students?'\n✅ 'To what extent does daily social media usage (hours/day) correlate with GPA among undergraduate students at UDSM in 2025?'"],
+  litreview:["For your literature review, search these databases:\n\n📚 Google Scholar (scholar.google.com) — free\n📚 JSTOR — peer-reviewed journals\n📚 African Journals Online (AJOL) — Africa-specific\n📚 ResearchGate — academic papers\n\nTip: Combine your topic keywords with 'Tanzania' or 'East Africa' to find locally relevant studies. Structure your review by themes, not just a list of summaries."],
+  methodology:["For most quantitative final year projects in Tanzania:\n\n1. Research Design: Descriptive correlational\n2. Sampling: Stratified random sampling\n3. Sample Size: Krejcie & Morgan (1970) table\n   → For 500 population → sample = 217\n   → For 1000 population → sample = 278\n4. Instrument: Structured questionnaire (Likert scale)\n5. Analysis: Frequency tables, percentages, Pearson correlation\n6. Reliability: Cronbach's Alpha ≥ 0.7"],
+  results:["When writing Chapter 4 (Results):\n\n1. Start with demographic data (gender, year of study)\n2. Present findings question by question\n3. Use frequency tables from Tafiti Pro\n4. In Chapter 4 you REPORT only — don't interpret yet\n5. Use phrases like:\n   • 'The findings revealed that...'\n   • 'Table 4.1 shows that...'\n   • 'Results indicated that...'\n\nSave your interpretation for Chapter 5."],
+  conclusion:["⭐ The AI Conclusion Writer requires a Premium account (TZS 25,000/month).\n\nWith Premium you get:\n• Full AI-written conclusion and recommendations\n• Automatic 5-chapter report generation\n• PDF and Word document export\n\nClick 'Upgrade Now' to unlock all features instantly."]
+};
+
+function getAI(t,txt){ var b=AIR[t]||AIR.general; return b[Math.floor(Math.random()*b.length)]; }
+
+function aiSend(){
+  var inp=document.getElementById('aiIn'),txt=inp.value.trim();
+  if(!txt) return;
+  var box=document.getElementById('aiMsgs'),uname=U?U.name[0].toUpperCase():'U';
+  box.innerHTML+='<div class="am2 um"><div class="amav uav">'+uname+'</div><div class="ambl">'+esc(txt)+'</div></div>';
+  inp.value=''; box.scrollTop=box.scrollHeight;
+  var tid='tp'+nid();
+  box.innerHTML+='<div class="am2" id="'+tid+'"><div class="amav bav">🤖</div><div class="ambl" style="color:var(--muted)">● ● ●</div></div>';
+  box.scrollTop=box.scrollHeight;
+  setTimeout(function(){
+    var el=document.getElementById(tid); if(el) el.remove();
+    box.innerHTML+='<div class="am2"><div class="amav bav">🤖</div><div class="ambl">'+getAI(AITYPE,txt)+'</div></div>';
+    box.scrollTop=box.scrollHeight;
+  },1100);
+}
+
+function qP(t){ var inp=document.getElementById('aiIn'); if(inp){inp.value=t; aiSend();} }
+
+// ════════════════════════════════════
+// PAYMENT
+// ════════════════════════════════════
+function togPay(){
+  var v=document.getElementById('pm').value;
+  var card=(v==='crdb'||v==='nmb'||v==='visa');
+  document.getElementById('phF').classList.toggle('hide',card);
+  document.getElementById('cdF').classList.toggle('hide',!card);
+}
+
+function doPay(){
+  toast('Processing payment...','tinf');
+  setTimeout(function(){
+    if(U){
+      U.plan='premium'; save();
+      var us=getUsers(); var ix=us.findIndex(function(u){return u.id===U.id;});
+      if(ix>=0){us[ix].plan='premium'; saveUsers(us);}
+      document.getElementById('spl').textContent='PREMIUM PLAN';
+      document.getElementById('premB').style.display='none';
+      document.getElementById('upgb').style.display='none';
+    }
+    closeM('payM');
+    toast('🎉 Premium activated! All features unlocked. TZS 25,000 charged.','tok');
+  },1800);
+}
+
+// ════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════
+function initAdmin(){
+  var us=getUsers(),pr=us.filter(function(u){return u.plan==='premium';}).length;
+  cu('adU',us.length); cu('adPr',pr); cu('adPj',PROJS.length);
+  document.getElementById('adRv').textContent=(pr*25000).toLocaleString('en-TZ');
+  document.getElementById('adUT').innerHTML=us.map(function(u){
+    return '<tr><td><strong>'+esc(u.name)+'</strong></td><td style="font-family:var(--ffc);font-size:11px">'+esc(u.email)+'</td>'
+      +'<td><span class="badge '+(u.plan==='premium'?'ba':'bt')+'">'+u.plan+'</span></td>'
+      +'<td>'+PROJS.filter(function(p){return p.studentId===u.id;}).length+'</td>'
+      +'<td style="font-family:var(--ffc);font-size:11px">'+new Date(u.createdAt).toLocaleDateString()+'</td>'
+      +'<td><button class="btn btn-g btn-sm" onclick="toast(\'Coming soon\',\'tinf\')">Manage</button></td></tr>';
+  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No users yet</td></tr>';
+  document.getElementById('adPT').innerHTML=PROJS.map(function(p){
+    return '<tr><td><strong style="font-size:12px">'+esc(p.title)+'</strong></td><td>'+esc(p.studentName||'—')+'</td>'
+      +'<td><span class="badge bb">'+cap(p.methodology||'')+'</span></td>'
+      +'<td>'+(p.responses||0)+'</td><td><span class="badge '+sb(p.status)+'">'+((p.status||'planning').replace(/_/g,' '))+'</span></td></tr>';
+  }).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No projects yet</td></tr>';
+  var pays=us.filter(function(u){return u.plan==='premium';}).map(function(u){
+    return '<tr><td>'+esc(u.name)+'</td><td style="font-family:var(--ffc)">25,000</td><td><span class="badge ba">Premium</span></td><td>M-Pesa</td><td style="font-family:var(--ffc);font-size:11px">'+new Date(u.createdAt).toLocaleDateString()+'</td><td><span class="badge bg">Completed</span></td></tr>';
+  }).join('');
+  document.getElementById('adPayT').innerHTML=pays||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No payments yet</td></tr>';
+}
+
+function aTab(t){
+  var tabs=['u','p','pay'];
+  document.querySelectorAll('.atb').forEach(function(b,i){b.classList.toggle('on',tabs[i]===t);});
+  document.getElementById('apU').classList.toggle('on',t==='u');
+  document.getElementById('apP').classList.toggle('on',t==='p');
+  document.getElementById('apPay').classList.toggle('on',t==='pay');
+}
+
+// ════════════════════════════════════
+// MISC
+// ════════════════════════════════════
+function excelEx(){ toast('Preparing Excel export...','tinf'); setTimeout(function(){toast('Excel file ready! (Connect backend for real export)','tok');},1400); }
+function scrollF(){ document.getElementById('featS').scrollIntoView({behavior:'smooth'}); }
+
+// ════════════════════════════════════
+// MODAL
+// ════════════════════════════════════
+function openM(id){ document.getElementById(id).classList.add('open'); }
+function closeM(id){ document.getElementById(id).classList.remove('open'); }
+
+// ════════════════════════════════════
+// TOAST
+// ════════════════════════════════════
+function toast(msg,type){
+  var ic={tok:'✅',ter:'❌',tinf:'ℹ️',twarn:'⚠️'};
+  var el=document.createElement('div');
+  el.className='toast '+(type||'tok');
+  el.innerHTML='<span>'+(ic[type]||'•')+'</span><span>'+msg+'</span>';
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(function(){el.remove();},3800);
+}
+
+// ════════════════════════════════════
+// COUNT UP
+// ════════════════════════════════════
+function cu(id,end){
+  var el=document.getElementById(id); if(!el) return;
+  var s=0,step=Math.max(1,Math.ceil(end/40));
+  var iv=setInterval(function(){s=Math.min(s+step,end);el.textContent=s.toLocaleString();if(s>=end)clearInterval(iv);},28);
+}
+
+// ════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════
+function g(id){var el=document.getElementById(id);return el?(el.value||'').trim():'';}
+function nid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+function cap(s){return s?(s.charAt(0).toUpperCase()+s.slice(1)):'';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function myP(){return U?PROJS.filter(function(p){return p.studentId===U.id;}):[]; }
+function sb(s){return{planning:'bb',data_collection:'bg',analysis:'ba',writing:'bp',completed:'bt'}[s]||'bb';}
+function qlbl(t){return{mc:'Multiple Choice',rating:'Rating Scale',open:'Open Ended',yn:'Yes / No',likert:'Likert Scale'}[t]||t;}
+function cap(s){return s?(s.charAt(0).toUpperCase()+s.slice(1)):'';}
+</script>
+</body>
+</html>
